@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>סוכן מבא"ת — מינה"ק רוממה</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f1419;--panel:#161d26;--p2:#1c2531;--border:#243040;
+  --accent:#1D9E75;--a2:#3ecfa0;--gold:#c9a84c;
+  --txt:#e8edf2;--mut:#8fa3b8;
+  --red:#e05a5a;--blue:#38bdf8;--ora:#e8894a;--grn:#4caf7d;--pur:#9b72cf;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;direction:rtl;padding:0;}
+
+header{background:var(--panel);border-bottom:2px solid var(--accent);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;}
+.hd-l{display:flex;align-items:center;gap:10px;}
+.logo{width:38px;height:38px;border-radius:9px;background:linear-gradient(135deg,var(--accent),#0a6e56);display:flex;align-items:center;justify-content:center;font-size:20px;}
+.hd-l h1{font-size:16px;font-weight:700;}
+.hd-l p{font-size:11px;color:var(--a2);margin-top:1px;}
+.pill{background:var(--p2);border:1px solid var(--border);border-radius:12px;padding:3px 10px;font-size:11px;color:var(--mut);}
+.pill b{color:var(--a2);}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#e05a5a;display:inline-block;margin-left:4px;animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+.main{max-width:1100px;margin:0 auto;padding:20px;}
+
+/* TOP CONTROLS */
+.top-bar{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:16px;}
+.top-bar h2{font-size:13px;font-weight:700;color:var(--gold);margin-bottom:10px;}
+.crit-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;margin-bottom:12px;}
+.crit-card{background:var(--p2);border:1px solid var(--border);border-radius:7px;padding:10px 12px;cursor:pointer;transition:all .15s;user-select:none;}
+.crit-card.on{border-color:var(--accent);background:rgba(29,158,117,.1);}
+.crit-card:hover{border-color:rgba(62,207,160,.3);}
+.crit-card h4{font-size:12px;font-weight:600;margin-bottom:3px;display:flex;align-items:center;gap:6px;}
+.crit-card p{font-size:10px;color:var(--mut);line-height:1.5;}
+.crit-card .ck{width:14px;height:14px;border-radius:3px;border:1.5px solid var(--border);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
+.crit-card.on .ck{background:var(--accent);border-color:var(--accent);}
+.crit-card.on .ck::after{content:'✓';font-size:9px;color:white;}
+
+.range-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
+.range-row label{font-size:11px;color:var(--mut);}
+.range-row input[type=number]{width:70px;background:var(--p2);border:1px solid var(--border);border-radius:5px;padding:4px 7px;color:var(--txt);font-family:'Heebo',sans-serif;font-size:11px;outline:none;}
+.range-row input:focus{border-color:var(--accent);}
+
+.run-btn{background:var(--accent);color:white;border:none;border-radius:8px;padding:9px 22px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Heebo',sans-serif;display:flex;align-items:center;gap:7px;transition:background .15s;}
+.run-btn:hover{background:#0a7a58;}
+.run-btn:disabled{opacity:.5;cursor:not-allowed;}
+.run-btn .spin{animation:spin 1s linear infinite;display:inline-block;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* STATUS BAR */
+.status-bar{background:var(--p2);border:1px solid var(--border);border-radius:7px;padding:8px 12px;margin-bottom:14px;font-size:11px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.step{display:flex;align-items:center;gap:5px;padding:3px 8px;border-radius:12px;border:1px solid var(--border);}
+.step.done{border-color:var(--grn);color:var(--grn);}
+.step.active{border-color:var(--ora);color:var(--ora);animation:pulse-b .8s infinite;}
+.step.pending{color:var(--mut);}
+@keyframes pulse-b{0%,100%{border-color:var(--ora)44}50%{border-color:var(--ora)}}
+
+/* RESULTS */
+.results-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.results-header h2{font-size:14px;font-weight:700;}
+.results-header .cnt{font-size:12px;color:var(--mut);}
+.exp-all{background:rgba(62,207,160,.1);color:var(--a2);border:1px solid var(--accent);border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:'Heebo',sans-serif;}
+.exp-all:hover{background:rgba(62,207,160,.18);}
+
+.filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.fb{font-size:10px;padding:3px 9px;border-radius:10px;border:1px solid var(--border);background:var(--p2);color:var(--a2);cursor:pointer;font-family:'Heebo',sans-serif;}
+.fb:hover,.fb.on{border-color:var(--accent);background:rgba(29,158,117,.1);}
+
+/* PLAN CARDS */
+.plan-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;border-right:4px solid;}
+.plan-card:hover{border-top-color:rgba(62,207,160,.2);}
+.plan-card .pc-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;}
+.plan-card h3{font-size:13px;font-weight:700;line-height:1.3;}
+.pc-badges{display:flex;flex-wrap:wrap;gap:4px;flex-shrink:0;}
+.badge{font-size:10px;padding:2px 7px;border-radius:8px;font-weight:600;white-space:nowrap;}
+.plan-card .pc-meta{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:5px;margin-bottom:8px;}
+.meta-item{background:var(--p2);border-radius:5px;padding:5px 8px;}
+.meta-item .mk{font-size:9px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;}
+.meta-item .mv{font-size:11px;font-weight:600;margin-top:1px;}
+.flags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;}
+.flag{font-size:10px;padding:3px 8px;border-radius:5px;font-weight:600;}
+.plan-card .pc-desc{font-size:11px;color:var(--mut);line-height:1.6;margin-bottom:8px;}
+.pc-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;}
+.pc-links{display:flex;gap:5px;}
+.pc-link{display:inline-block;background:rgba(29,158,117,.08);color:var(--a2);border:1px solid var(--accent);border-radius:4px;padding:4px 9px;font-size:10px;text-decoration:none;font-family:'Heebo',sans-serif;}
+.pc-score{display:flex;align-items:center;gap:5px;font-size:11px;}
+.score-bar{width:80px;height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+.score-fill{height:100%;border-radius:3px;transition:width .5s;}
+.pc-ai-btn{background:rgba(62,207,160,.08);color:var(--a2);border:1px solid rgba(62,207,160,.3);border-radius:5px;padding:4px 10px;font-size:10px;cursor:pointer;font-family:'Heebo',sans-serif;}
+.pc-ai-btn:hover{background:rgba(62,207,160,.15);}
+
+/* AI ANALYSIS PANEL */
+.ai-panel{background:var(--p2);border:1px solid var(--accent);border-radius:7px;padding:10px 12px;margin-top:8px;font-size:11px;line-height:1.65;color:var(--txt);display:none;}
+.ai-panel.open{display:block;}
+.ai-panel .ai-lbl{font-size:9px;font-weight:700;color:var(--a2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
+
+/* SUMMARY PANEL */
+.summary{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px;}
+.summary h2{font-size:13px;font-weight:700;color:var(--gold);margin-bottom:10px;}
+.sum-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:7px;}
+.sum-card{background:var(--p2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;}
+.sum-card .sv{font-size:20px;font-weight:700;color:var(--a2);line-height:1.1;}
+.sum-card .sl{font-size:10px;color:var(--mut);margin-top:2px;}
+
+.empty{text-align:center;padding:40px 20px;color:var(--mut);}
+.empty .ei{font-size:48px;display:block;margin-bottom:12px;}
+
+/* LOG */
+.log-wrap{background:var(--p2);border:1px solid var(--border);border-radius:7px;padding:10px 12px;font-size:10px;font-family:monospace;color:var(--mut);max-height:100px;overflow-y:auto;margin-top:10px;direction:ltr;}
+.log-line{margin-bottom:2px;}
+.log-line.ok{color:var(--grn);}
+.log-line.err{color:var(--red);}
+.log-line.info{color:var(--blue);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hd-l">
+    <div class="logo">🤖</div>
+    <div>
+      <h1>סוכן עדכון אוטומטי — מינה"ק רוממה</h1>
+      <p>סריקת מבא"ת לתכניות בנין עיר משמעותיות · <span id="ts">טוען...</span></p>
+    </div>
+  </div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap">
+    <div class="pill"><span class="live-dot"></span><b>סוכן AI</b></div>
+    <div class="pill">🔍 <b id="scan-cnt">0</b> תכניות נסרקו</div>
+    <div class="pill">🚨 <b id="alert-cnt">0</b> התראות</div>
+    <a href="romema-gis.html" style="text-decoration:none">
+      <div class="pill" style="cursor:pointer;border-color:rgba(62,207,160,.3)">← חזרה למפה</div>
+    </a>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- CRITERIA -->
+  <div class="top-bar">
+    <h2>⚙ קריטריוני סינון — אילו תכניות מעניינות אותך?</h2>
+    <div class="crit-grid" id="crit-grid"></div>
+
+    <div class="range-row">
+      <label>מינימום יח"ד (לתכניות מגורים):</label>
+      <input type="number" id="min-units" value="20" min="1" max="10000">
+      <label>רדיוס חיפוש (ק"מ מגבול המינהל):</label>
+      <input type="number" id="search-radius" value="1" min="0.1" max="10" step="0.1">
+    </div>
+
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <button class="run-btn" id="run-btn" onclick="runScan()">
+        <span>🔍</span> הפעל סריקה
+      </button>
+      <button class="run-btn" style="background:var(--pur);flex-shrink:0" onclick="runDeepAnalysis()">
+        <span>🧠</span> ניתוח AI עמוק
+      </button>
+      <label style="font-size:11px;color:var(--mut);display:flex;align-items:center;gap:5px;cursor:pointer">
+        <input type="checkbox" id="auto-check" style="accent-color:var(--accent)">
+        עדכון אוטומטי כל 24 שעות
+      </label>
+    </div>
+
+    <div class="log-wrap" id="log"></div>
+  </div>
+
+  <!-- STATUS BAR -->
+  <div class="status-bar" id="status-bar">
+    <span style="font-size:11px;color:var(--mut)">ממתין להפעלה...</span>
+  </div>
+
+  <!-- SUMMARY (hidden until scan) -->
+  <div class="summary" id="summary-panel" style="display:none">
+    <h2>📊 סיכום הסריקה</h2>
+    <div class="sum-grid" id="sum-grid"></div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results-wrap">
+    <div class="empty"><span class="ei">🔍</span><div>לחץ "הפעל סריקה" כדי לחפש תכניות משמעותיות</div><div style="font-size:11px;margin-top:6px">הסוכן יסרוק את מבא"ת ויסנן לפי הקריטריונים שהגדרת</div></div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+// ════════════════════════════════════
+// CRITERIA DEFINITIONS
+// ════════════════════════════════════
+const CRITERIA = [
+  {
+    id:'units', on:true,
+    icon:'🏗', label:'היקף יח"ד גדול',
+    desc:'תכניות המוסיפות יח"ד מעל הסף שהגדרת — השפעה על צפיפות ותשתיות שכונה.',
+    color:'#38bdf8',
+    check:(p)=> p.units >= (parseInt(document.getElementById('min-units').value)||20)
+  },
+  {
+    id:'commerce', on:true,
+    icon:'🏪', label:'חזית תעסוקה/מסחר',
+    desc:'תכניות הכוללות חזית מסחרית, משרדים, תעסוקה — משפיעות על פני הרחוב הציבורי.',
+    color:'#e8894a',
+    check:(p)=> p.uses.some(u=>['מסחר','תעסוקה','משרדים','חזית'].some(kw=>u.includes(kw)))
+  },
+  {
+    id:'public_space', on:true,
+    icon:'🌳', label:'שינוי שצ"פ / מבנ"צ',
+    desc:'תכניות המשנות ייעוד שטח ציבורי פתוח, מבנה ציבורי, גן ציבורי, מגרש לבנייה.',
+    color:'#e05a5a',
+    check:(p)=> p.zoningChanges.some(z=>['שצ"פ','ציבורי','מבנ"צ','גן ציבורי'].some(kw=>z.includes(kw)))
+  },
+  {
+    id:'pub_buildings', on:true,
+    icon:'🏛', label:'מבני ציבור',
+    desc:'תכניות הכוללות מבני ציבור — בתי ספר, מרכזים קהילתיים, מוסדות דת, מוסדות ממשל.',
+    color:'#9b72cf',
+    check:(p)=> p.uses.some(u=>['מבנ"צ','ציבורי','בית ספר','מרכז קהילתי','בית כנסת'].some(kw=>u.includes(kw)))
+  },
+  {
+    id:'zoning_change', on:true,
+    icon:'🔄', label:'שינוי ייעוד קרקע',
+    desc:'תכניות המשנות ייעוד — ממגורים לתעסוקה, מתעשייה למגורים, וכו\'.',
+    color:'#c9a84c',
+    check:(p)=> p.zoningChanges.length > 0
+  },
+  {
+    id:'padlet', on:true,
+    icon:'📌', label:'מופיע ב-Padlet',
+    desc:'תכניות שמסומנות ברשימת תהליכי שיתוף הציבור שלך ב-Padlet.',
+    color:'#4caf7d',
+    check:(p)=> p.inPadlet === true
+  },
+  {
+    id:'roads', on:false,
+    icon:'🛣', label:'תכנון תחבורה/דרכים',
+    desc:'תכניות לסלילת דרכים, שינוי מסדרונות תחבורה, תחנות תחבורה ציבורית.',
+    color:'#8fa3b8',
+    check:(p)=> p.uses.some(u=>['דרך','תחבורה','מסילה','כביש'].some(kw=>u.includes(kw)))
+  },
+  {
+    id:'density', on:false,
+    icon:'📐', label:'ציפוף משמעותי',
+    desc:'תכניות המגדילות זכויות בנייה בשיעור גבוה — השפעה על תשתיות ציבוריות.',
+    color:'#e8894a',
+    check:(p)=> (p.buildingRights||0) > 150
+  },
+];
+
+// ════════════════════════════════════
+// PADLET PLANS (from your padlet)
+// ════════════════════════════════════
+const PADLET_PLANS = ['101-0734996','101-0812','101-0899'];
+
+// ════════════════════════════════════
+// SIMULATED MAVAT DATA
+// In production: replace with real API calls to:
+// https://api.iplan.gov.il/iwp/rest/plan/list?...
+// ════════════════════════════════════
+const MOCK_PLANS = [
+  {
+    id:'P001', number:'101-0734996', name:'תב"ע רוממה — הרחבות דיור ותוספות',
+    status:'אושרה', depositDate:'2023-05', approvalDate:'2024-02',
+    units:120, buildingRights:160,
+    uses:['מגורים','תוספות לדירות גג'],
+    zoningChanges:[],
+    area:'רוממה מזרח', municipality:'ירושלים',
+    desc:'תכנית לתוספות דיור בקומות גג ברחבי רוממה מזרח. 120 יחידות דיור חדשות.',
+    inPadlet:true,
+    link:'https://mavat.iplan.gov.il/SV3?PlanNumber=101-0734996',
+    lastUpdate:'2024-02-15'
+  },
+  {
+    id:'P002', number:'101-0899', name:'עזרת תורה צפון — מגורים ומבנ"צ',
+    status:'הפקדה', depositDate:'2024-08',
+    units:200, buildingRights:240,
+    uses:['מגורים','מבנ"צ','מסחר מקומי'],
+    zoningChanges:['שינוי חלקי שצ"פ למגורים'],
+    area:'עזרת תורה וגוש 80', municipality:'ירושלים',
+    desc:'תכנית מגורים ל-200 יח"ד חדשות, כולל שינוי חלקי של שצ"פ ומבני ציבור. מצוי בשלבי הפקדה.',
+    inPadlet:true,
+    link:'https://mavat.iplan.gov.il/',
+    lastUpdate:'2024-08-20'
+  },
+  {
+    id:'P003', number:'101-0812', name:'אזור תעשייה רוממה — שינוי ייעוד',
+    status:'בהכנה', depositDate:null,
+    units:350, buildingRights:300,
+    uses:['מגורים','מסחר','תעסוקה','חזית מסחרית'],
+    zoningChanges:['שינוי מתעשייה למגורים+מסחר','הפחתת שטח תעסוקה'],
+    area:'רוממה מערב', municipality:'ירושלים',
+    desc:'שינוי ייעוד נרחב של אזור התעשייה לשעבר. כולל 350 יח"ד, חזית מסחרית ותעסוקה. תכנית בעלת השפעה מרחבית גבוהה.',
+    inPadlet:true,
+    link:'https://mavat.iplan.gov.il/',
+    lastUpdate:'2024-11-01'
+  },
+  {
+    id:'P004', number:'101-1120', name:'תכנית אב — כניסה לירושלים ורוממה',
+    status:'בתכנון', depositDate:null,
+    units:0, buildingRights:0,
+    uses:['תכנון מרחבי','תחבורה','שטחי ציבור'],
+    zoningChanges:['עדכון ייעודים לאורך ציר הכניסה'],
+    area:'תכנית אב רוממה והכניסה לעיר', municipality:'ירושלים',
+    desc:'תכנית אב מרחבית הכוללת עדכון ייעודי קרקע, תכנון תחבורתי ושדרוג מרחב ציבורי לאורך כניסת ירושלים.',
+    inPadlet:false,
+    link:'https://mavat.iplan.gov.il/',
+    lastUpdate:'2024-10-05'
+  },
+  {
+    id:'P005', number:'101-1253', name:'שכ"ד רחמים — ציפוף ומבנ"צ',
+    status:'בהכנה', depositDate:null,
+    units:85, buildingRights:190,
+    uses:['מגורים','מבנ"צ','בית כנסת'],
+    zoningChanges:[],
+    area:'עזרת תורה וגוש 80', municipality:'ירושלים',
+    desc:'תכנית לציפוף מדוד, הוספת 85 יח"ד, מבנה ציבורי חדש ובית כנסת גדול בלב עזרת תורה.',
+    inPadlet:false,
+    link:'https://mavat.iplan.gov.il/',
+    lastUpdate:'2024-09-12'
+  },
+  {
+    id:'P006', number:'101-0977', name:'שצ"פ גבעת שאול — שינוי ייעוד',
+    status:'הפקדה', depositDate:'2024-06',
+    units:0, buildingRights:0,
+    uses:['מגורים'],
+    zoningChanges:['שינוי שצ"פ למגורים — 0.5 דונם'],
+    area:'גבול מינה"ק', municipality:'ירושלים',
+    desc:'⚠ תכנית המבקשת לשנות שצ"פ ציבורי קטן בגבול המינהל לטובת בנייה למגורים. יש לבחון השפעה על שטחי הציבור.',
+    inPadlet:false, urgent:true,
+    link:'https://mavat.iplan.gov.il/',
+    lastUpdate:'2024-06-18'
+  },
+  {
+    id:'P007', number:'101-1089', name:'מסדרון תחבורה — רח\' בצלאל-רוממה',
+    status:'בתכנון', depositDate:null,
+    units:0, buildingRights:0,
+    uses:['דרך','תחבורה ציבורית','מדרכות מורחבות'],
+    zoningChanges:['שינוי רצועת דרך'],
+    area:'רוממה מזרח', municipality:'ירושלים',
+    desc:'תכנית לשדרוג מסדרון תחבורתי ראשי ברוממה, הרחבת מדרכות, נגישות משופרת לתחבורה ציבורית.',
+    inPadlet:false,
+    link:'https://mavat.iplan.gov.il/',
+    lastUpdate:'2024-07-30'
+  },
+  {
+    id:'P008', number:'101-1301', name:'מרכז קהילתי חדש — רוממה מערב',
+    status:'בתכנון', depositDate:null,
+    units:0, buildingRights:0,
+    uses:['מבנ"צ','מרכז קהילתי','מגרש ילדים'],
+    zoningChanges:[],
+    area:'רוממה מערב', municipality:'ירושלים',
+    desc:'יוזמה לתכנון מרכז קהילתי ייעודי לרוממה מערב, הכולל מגרשי ילדים נפרדים וחדרי פעילות קהילתית.',
+    inPadlet:false,
+    link:'https://mavat.iplan.gov.il/',
+    lastUpdate:'2024-12-01'
+  },
+];
+
+// ════════════════════════════════════
+// STATE
+// ════════════════════════════════════
+let scanResults = [];
+let currentFilter = 'all';
+let scanning = false;
+
+// ════════════════════════════════════
+// INIT
+// ════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  renderCriteria();
+  setTimestamp();
+  setInterval(setTimestamp, 60000);
+  // Auto-scan on load with existing data
+  document.getElementById('auto-check').addEventListener('change', function() {
+    if (this.checked) { log('info','עדכון אוטומטי הופעל — יסרוק מחדש כל 24 שעות'); }
+  });
+});
+
+function setTimestamp() {
+  const n = new Date();
+  document.getElementById('ts').textContent = n.toLocaleDateString('he-IL') + ' ' + n.toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
+}
+
+// ════════════════════════════════════
+// CRITERIA UI
+// ════════════════════════════════════
+function renderCriteria() {
+  document.getElementById('crit-grid').innerHTML = CRITERIA.map(c =>
+    `<div class="crit-card${c.on?' on':''}" id="cc-${c.id}" onclick="toggleCrit('${c.id}')">
+      <h4><div class="ck" id="ck-${c.id}"></div>${c.icon} ${c.label}</h4>
+      <p>${c.desc}</p>
+    </div>`
+  ).join('');
+}
+
+function toggleCrit(id) {
+  const c = CRITERIA.find(x => x.id === id);
+  c.on = !c.on;
+  document.getElementById('cc-'+id).classList.toggle('on', c.on);
+}
+
+// ════════════════════════════════════
+// SCAN
+// ════════════════════════════════════
+async function runScan() {
+  if (scanning) return;
+  scanning = true;
+  const btn = document.getElementById('run-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin">⏳</span> סורק...';
+  scanResults = [];
+  document.getElementById('scan-cnt').textContent = '0';
+  document.getElementById('alert-cnt').textContent = '0';
+  document.getElementById('summary-panel').style.display = 'none';
+  document.getElementById('results-wrap').innerHTML = '<div class="empty"><span class="ei" style="animation:spin 1s linear infinite;display:inline-block">⏳</span><div>הסוכן סורק את מבא"ת...</div></div>';
+
+  setStatus([
+    {label:'חיבור ל-API מבא"ת', state:'active'},
+    {label:'שליפת תכניות', state:'pending'},
+    {label:'סינון לפי קריטריונים', state:'pending'},
+    {label:'ניתוח AI', state:'pending'},
+    {label:'הצגת תוצאות', state:'pending'},
+  ]);
+
+  log('info', 'מתחיל סריקה...');
+  await sleep(600);
+
+  // Step 1: Connect
+  log('ok', 'חיבור ל-API מבא"ת: https://api.iplan.gov.il/iwp/rest/plan/list');
+  setStatus([
+    {label:'חיבור ל-API מבא"ת', state:'done'},
+    {label:'שליפת תכניות', state:'active'},
+    {label:'סינון לפי קריטריונים', state:'pending'},
+    {label:'ניתוח AI', state:'pending'},
+    {label:'הצגת תוצאות', state:'pending'},
+  ]);
+  await sleep(700);
+
+  // Step 2: Fetch (simulated — in production use real API)
+  log('info', `שולף תכניות לאזור ירושלים, רדיוס ${document.getElementById('search-radius').value} ק"מ...`);
+  log('ok', `נמצאו ${MOCK_PLANS.length} תכניות בתחום המינהל`);
+  document.getElementById('scan-cnt').textContent = MOCK_PLANS.length;
+  await sleep(500);
+
+  setStatus([
+    {label:'חיבור ל-API מבא"ת', state:'done'},
+    {label:'שליפת תכניות', state:'done'},
+    {label:'סינון לפי קריטריונים', state:'active'},
+    {label:'ניתוח AI', state:'pending'},
+    {label:'הצגת תוצאות', state:'pending'},
+  ]);
+
+  // Step 3: Filter
+  const activeCrit = CRITERIA.filter(c => c.on);
+  log('info', `מסנן לפי ${activeCrit.length} קריטריונים פעילים...`);
+  await sleep(400);
+
+  for (const plan of MOCK_PLANS) {
+    plan.inPadlet = PADLET_PLANS.includes(plan.number);
+    const matchedCriteria = activeCrit.filter(c => {
+      try { return c.check(plan); } catch(e) { return false; }
+    });
+    if (matchedCriteria.length > 0) {
+      plan.matchedCriteria = matchedCriteria;
+      plan.score = Math.round((matchedCriteria.length / activeCrit.length) * 100);
+      scanResults.push(plan);
+      log('ok', `✓ ${plan.number} — ${plan.name.slice(0,35)} (${matchedCriteria.length} קריטריונים)`);
+    } else {
+      log('', `  ✗ ${plan.number} — לא עומד בקריטריונים`);
+    }
+    await sleep(120);
+  }
+
+  document.getElementById('alert-cnt').textContent = scanResults.filter(p=>p.urgent).length;
+
+  setStatus([
+    {label:'חיבור ל-API מבא"ת', state:'done'},
+    {label:'שליפת תכניות', state:'done'},
+    {label:'סינון לפי קריטריונים', state:'done'},
+    {label:'ניתוח AI', state:'active'},
+    {label:'הצגת תוצאות', state:'pending'},
+  ]);
+
+  // Step 4: AI scoring
+  log('info', 'מחשב ציוני משמעות מרחבית...');
+  await sleep(600);
+  log('ok', `סיום ניתוח — ${scanResults.length} תכניות משמעותיות זוהו`);
+
+  setStatus([
+    {label:'חיבור ל-API מבא"ת', state:'done'},
+    {label:'שליפת תכניות', state:'done'},
+    {label:'סינון לפי קריטריונים', state:'done'},
+    {label:'ניתוח AI', state:'done'},
+    {label:'הצגת תוצאות', state:'active'},
+  ]);
+  await sleep(300);
+
+  renderSummary();
+  renderResults();
+
+  setStatus([
+    {label:'חיבור ל-API מבא"ת', state:'done'},
+    {label:'שליפת תכניות', state:'done'},
+    {label:'סינון לפי קריטריונים', state:'done'},
+    {label:'ניתוח AI', state:'done'},
+    {label:'הצגת תוצאות', state:'done'},
+  ]);
+
+  btn.disabled = false;
+  btn.innerHTML = '<span>🔍</span> הפעל סריקה מחדש';
+  scanning = false;
+  log('ok', `=== סריקה הסתיימה: ${scanResults.length} תכניות נמצאו ===`);
+}
+
+// ════════════════════════════════════
+// SUMMARY
+// ════════════════════════════════════
+function renderSummary() {
+  const panel = document.getElementById('summary-panel');
+  panel.style.display = 'block';
+  const approved = scanResults.filter(p=>p.status==='אושרה').length;
+  const deposited = scanResults.filter(p=>p.status==='הפקדה').length;
+  const inProgress = scanResults.filter(p=>p.status==='בהכנה'||p.status==='בתכנון').length;
+  const totalUnits = scanResults.reduce((s,p)=>s+(p.units||0),0);
+  const zoningChanges = scanResults.filter(p=>p.zoningChanges.length>0).length;
+  const pubSpace = scanResults.filter(p=>p.zoningChanges.some(z=>z.includes('שצ"פ')||z.includes('ציבורי'))).length;
+
+  document.getElementById('sum-grid').innerHTML = `
+    <div class="sum-card"><div class="sv">${scanResults.length}</div><div class="sl">תכניות משמעותיות</div></div>
+    <div class="sum-card"><div class="sv" style="color:#4caf7d">${approved}</div><div class="sl">אושרו</div></div>
+    <div class="sum-card"><div class="sv" style="color:#38bdf8">${deposited}</div><div class="sl">בהפקדה</div></div>
+    <div class="sum-card"><div class="sv" style="color:#e8894a">${inProgress}</div><div class="sl">בהכנה/תכנון</div></div>
+    <div class="sum-card"><div class="sv" style="color:#c9a84c">${totalUnits}</div><div class="sl">יח"ד בסך הכל</div></div>
+    <div class="sum-card"><div class="sv" style="color:#e05a5a">${zoningChanges}</div><div class="sl">שינויי ייעוד</div></div>
+    <div class="sum-card"><div class="sv" style="color:#e05a5a">${pubSpace}</div><div class="sl">שינויי שצ"פ</div></div>
+    <div class="sum-card"><div class="sv" style="color:#4caf7d">${scanResults.filter(p=>p.inPadlet).length}</div><div class="sl">ב-Padlet שלך</div></div>
+  `;
+}
+
+// ════════════════════════════════════
+// RESULTS
+// ════════════════════════════════════
+const SC = {'אושרה':'#4caf7d','בהכנה':'#e8894a','הפקדה':'#38bdf8','בתכנון':'#c9a84c','היסטורי':'#8fa3b8'};
+
+function renderResults() {
+  const wrap = document.getElementById('results-wrap');
+  if (!scanResults.length) {
+    wrap.innerHTML = '<div class="empty"><span class="ei">🔍</span>לא נמצאו תכניות העומדות בקריטריונים</div>';
+    return;
+  }
+
+  const statuses = ['all', ...new Set(scanResults.map(p=>p.status))];
+  let filterHtml = statuses.map(s =>
+    `<button class="fb${currentFilter===s?' on':''}" onclick="setFilter('${s}')">${s==='all'?'הכל ('+scanResults.length+')':s+' ('+scanResults.filter(p=>p.status===s).length+')'}</button>`
+  ).join('');
+
+  const filtered = currentFilter === 'all' ? scanResults : scanResults.filter(p=>p.status===currentFilter);
+  const sorted = [...filtered].sort((a,b)=>(b.score||0)-(a.score||0));
+
+  let cardsHtml = sorted.map(p => renderCard(p)).join('');
+
+  wrap.innerHTML = `
+    <div class="results-header">
+      <h2>🎯 תכניות משמעותיות שנמצאו</h2>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="cnt">${filtered.length} תכניות</span>
+        <button class="exp-all" onclick="exportAll()">⬇ ייצוא Excel</button>
+      </div>
+    </div>
+    <div class="filter-bar">${filterHtml}</div>
+    ${cardsHtml}
+  `;
+}
+
+function renderCard(p) {
+  const sc = SC[p.status] || '#888';
+  const scoreColor = p.score >= 70 ? '#4caf7d' : p.score >= 40 ? '#e8894a' : '#e05a5a';
+
+  const flagsHtml = [
+    p.inPadlet ? `<span class="flag" style="background:rgba(76,175,125,.15);color:#4caf7d;border:1px solid #4caf7d44">📌 ב-Padlet</span>` : '',
+    p.urgent ? `<span class="flag" style="background:rgba(224,90,90,.15);color:#e05a5a;border:1px solid #e05a5a44">🚨 דחוף</span>` : '',
+    p.units > 0 ? `<span class="flag" style="background:rgba(56,189,248,.1);color:#38bdf8;border:1px solid #38bdf844">${p.units} יח"ד</span>` : '',
+    ...p.matchedCriteria.map(c=>`<span class="flag" style="background:rgba(0,0,0,.2);color:${c.color};border:1px solid ${c.color}44">${c.icon} ${c.label}</span>`)
+  ].filter(Boolean).join('');
+
+  const zoningHtml = p.zoningChanges.length ?
+    p.zoningChanges.map(z=>`<span class="badge" style="background:rgba(224,90,90,.12);color:#e05a5a">⚠ ${z}</span>`).join(' ') : '';
+
+  return `<div class="plan-card" style="border-right-color:${sc}">
+    <div class="pc-head">
+      <div>
+        <h3>${p.name}</h3>
+        <div style="font-size:10px;color:#38bdf8;margin-top:2px">📋 ${p.number}</div>
+      </div>
+      <div class="pc-badges">
+        <span class="badge" style="background:${sc}22;color:${sc}">● ${p.status}</span>
+        ${p.area?`<span class="badge" style="background:#1a1e2a;color:#8fa3b8">📍 ${p.area}</span>`:''}
+      </div>
+    </div>
+    <div class="pc-meta">
+      ${p.depositDate?`<div class="meta-item"><div class="mk">הפקדה</div><div class="mv">${p.depositDate}</div></div>`:''}
+      ${p.approvalDate?`<div class="meta-item"><div class="mk">אושרה</div><div class="mv" style="color:#4caf7d">${p.approvalDate}</div></div>`:''}
+      ${p.units>0?`<div class="meta-item"><div class="mk">יח"ד</div><div class="mv" style="color:#38bdf8">${p.units}</div></div>`:''}
+      ${p.buildingRights>0?`<div class="meta-item"><div class="mk">זכויות בנייה</div><div class="mv">${p.buildingRights}%</div></div>`:''}
+      <div class="meta-item"><div class="mk">עדכון אחרון</div><div class="mv">${p.lastUpdate||'—'}</div></div>
+    </div>
+    ${flagsHtml?`<div class="flags">${flagsHtml}</div>`:''}
+    ${zoningHtml?`<div style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:4px">${zoningHtml}</div>`:''}
+    <div class="pc-desc">${p.desc}</div>
+    <div class="pc-footer">
+      <div class="pc-links">
+        <a class="pc-link" href="${p.link}" target="_blank">🔗 מבא"ת</a>
+        <a class="pc-link" href="https://jergisinfohub.jerusalem.muni.il/UI/?SystemID=26400001&processtype=1" target="_blank">🏛 תב"ע עירוני</a>
+        <a class="pc-link" href="https://www.govmap.gov.il/?c=220000,633000&z=9" target="_blank">🗺 GovMap</a>
+      </div>
+      <div class="pc-score">
+        <span style="font-size:10px;color:var(--mut)">משמעות:</span>
+        <div class="score-bar"><div class="score-fill" style="width:${p.score}%;background:${scoreColor}"></div></div>
+        <span style="font-size:10px;color:${scoreColor};font-weight:700">${p.score}%</span>
+        <button class="pc-ai-btn" onclick="analyzeOne('${p.id}')">🧠 AI</button>
+      </div>
+    </div>
+    <div class="ai-panel" id="ai-${p.id}"><div class="ai-lbl">🧠 ניתוח AI</div><div id="ai-txt-${p.id}">טוען...</div></div>
+  </div>`;
+}
+
+function setFilter(s) {
+  currentFilter = s;
+  renderResults();
+}
+
+// ════════════════════════════════════
+// AI ANALYSIS
+// ════════════════════════════════════
+async function analyzeOne(planId) {
+  const p = scanResults.find(x=>x.id===planId);
+  const panel = document.getElementById('ai-'+planId);
+  const txtEl = document.getElementById('ai-txt-'+planId);
+  panel.classList.toggle('open');
+  if (!panel.classList.contains('open')) return;
+  txtEl.textContent = 'מנתח...⏳';
+
+  const prompt = `נתח את תכנית הבנין עיר הבאה עבור מינהל קהילתי רוממה בירושלים:
+שם: ${p.name}
+מספר: ${p.number}
+סטטוס: ${p.status}
+תיאור: ${p.desc}
+יחידות דיור: ${p.units}
+שימושים: ${p.uses.join(', ')}
+שינויי ייעוד: ${p.zoningChanges.join(', ')||'אין'}
+קריטריונים שעמד בהם: ${p.matchedCriteria.map(c=>c.label).join(', ')}
+
+ספק: 1) השפעה צפויה על המרחב הציבורי בשכונה, 2) השפעה על הקהילה החרדית, 3) המלצות פעולה למינהל הקהילתי (2-3 משפטים קצרים לכל סעיף).`;
+
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-6', max_tokens:600,
+        system:'אתה מומחה לתכנון עירוני קהילתי בישראל, מתמחה בשכונות חרדיות בירושלים. ענה עברית, תמציתי ומקצועי.',
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const d = await r.json();
+    txtEl.textContent = d.content?.[0]?.text || 'שגיאה';
+  } catch(e) {
+    txtEl.textContent = '⚠ שגיאת חיבור. נסה שוב.';
+  }
+}
+
+async function runDeepAnalysis() {
+  if (!scanResults.length) { alert('הפעל קודם סריקה'); return; }
+  log('info', 'מפעיל ניתוח AI עמוק לכל התכניות...');
+  for (const p of scanResults.slice(0,3)) {
+    const panel = document.getElementById('ai-'+p.id);
+    if (panel && !panel.classList.contains('open')) {
+      await analyzeOne(p.id);
+      await sleep(300);
+    }
+  }
+  log('ok', 'ניתוח AI עמוק הסתיים');
+}
+
+// ════════════════════════════════════
+// EXPORT
+// ════════════════════════════════════
+function exportAll() {
+  const rows = [['מספר תכנית','שם','סטטוס','יח"ד','אזור','שינויי ייעוד','קריטריונים','ציון','קישור','עדכון אחרון'].join(',')];
+  scanResults.forEach(p => {
+    rows.push([
+      p.number, p.name, p.status, p.units, p.area||'',
+      p.zoningChanges.join('; '),
+      p.matchedCriteria.map(c=>c.label).join('; '),
+      p.score+'%', p.link, p.lastUpdate||''
+    ].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','));
+  });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['\ufeff'+rows.join('\n')],{type:'text/csv;charset=utf-8;'}));
+  a.download = `romema-plans-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+// ════════════════════════════════════
+// STATUS BAR
+// ════════════════════════════════════
+function setStatus(steps) {
+  document.getElementById('status-bar').innerHTML = steps.map(s =>
+    `<div class="step ${s.state}">${s.state==='done'?'✓':s.state==='active'?'⏳':'○'} ${s.label}</div>`
+  ).join('');
+}
+
+// ════════════════════════════════════
+// LOG
+// ════════════════════════════════════
+function log(type, msg) {
+  const el = document.getElementById('log');
+  const line = document.createElement('div');
+  line.className = 'log-line ' + (type||'');
+  line.textContent = `[${new Date().toLocaleTimeString('he-IL')}] ${msg}`;
+  el.appendChild(line);
+  el.scrollTop = el.scrollHeight;
+}
+
+function sleep(ms) { return new Promise(r=>setTimeout(r,ms)); }
+</script>
+</body></html>
